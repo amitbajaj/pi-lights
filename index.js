@@ -22,10 +22,11 @@ io.sockets.on('connection', function (socket) {// WebSocket Connection
     socket.on('light', function(data) { //get light switch status from client
       lightvalue = data;
       if (lightvalue) {
-        console.log(lightvalue); //turn LED on or off, for now we will just show it in console.log
+        console.log(1); //turn LED on or off, for now we will just show it in console.log
         socket.emit(0);
       }else{
-          socket.emit(1);
+        console.log(0); //turn LED on or off, for now we will just show it in console.log
+        socket.emit(1);
       }
     });
   });
