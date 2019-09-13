@@ -21,12 +21,10 @@ io.sockets.on('connection', function (socket) {// WebSocket Connection
     var lightvalue = 0; //static variable for current status
     socket.on('light', function(data) { //get light switch status from client
       lightvalue = data;
-      if (lightvalue) {
-        console.log(1); //turn LED on or off, for now we will just show it in console.log
-        socket.emit("light",0);
-      }else{
-        console.log(0); //turn LED on or off, for now we will just show it in console.log
-        socket.emit("light",1);
+      if (lightvalue>=10) {
+        //console.log(1); //turn LED on or off, for now we will just show it in console.log
+        lightvalue = -1;
       }
+      socket.emit("light",lightvalue+1);
     });
   });
