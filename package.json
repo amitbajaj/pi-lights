@@ -9,6 +9,9 @@
   "scripts": {
     "start": "node index.js"
   },
+  "dependencies": {
+    "socket.io": "*"
+  },
   "keywords": [
     "node",
     "heroku",
