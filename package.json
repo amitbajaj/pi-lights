@@ -11,8 +11,13 @@
   },
   "dependencies": {
     "socket.io": "*",
-    "onoff":"*"
+    "onoff": "*"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amitbajaj/pi-lights.git"
+  },
+  "license": "Apache-2.0",
   "keywords": [
     "node",
     "heroku",
