@@ -2,6 +2,8 @@ const PORT = process.env.PORT || 5000
 var http = require('http').createServer(handler); //require http server, and create server with function handler()
 var fs = require('fs'); //require filesystem module
 var io = require('socket.io')(http) //require socket.io module and pass the http object (server)
+var Gpio = require('onoff').Gpio; //require onoff module to interact with GPIO header
+var LED = new Gpio(21, 'out'); //use GPIO pin 21, and specify that it is output
 
 http.listen(PORT); //listen to port (either the system or local 5000)
 
@@ -24,6 +26,7 @@ io.sockets.on('connection', function (socket) {// WebSocket Connection
       if (lightvalue>=10) {
         //console.log(1); //turn LED on or off, for now we will just show it in console.log
         lightvalue = -1;
+        socket.emit("toggle",1);
       }
       socket.emit("light",lightvalue+1);
     });

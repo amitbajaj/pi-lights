@@ -10,7 +10,8 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "socket.io": "*"
+    "socket.io": "*",
+    "onoff":"*"
   },
   "keywords": [
     "node",
