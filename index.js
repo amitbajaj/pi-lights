@@ -3,7 +3,10 @@ var http = require('http').createServer(handler); //require http server, and cre
 var fs = require('fs'); //require filesystem module
 var io = require('socket.io')(http) //require socket.io module and pass the http object (server)
 var Gpio = require('onoff').Gpio; //require onoff module to interact with GPIO header
-var LED = new Gpio(21, 'out'); //use GPIO pin 21, and specify that it is output
+var R1 = new Gpio(26, 'out'); //use GPIO pin 26 for Relay 1, and specify that it is output
+var R2 = new Gpio(19, 'out'); //use GPIO pin 19 for Relay 2, and specify that it is output
+var R3 = new Gpio(13, 'out'); //use GPIO pin 13 for Relay 3, and specify that it is output
+var R4 = new Gpio(6, 'out');  //use GPIO pin  6 for Relay 4, and specify that it is output
 
 http.listen(PORT); //listen to port (either the system or local 5000)
 
@@ -27,7 +30,42 @@ io.sockets.on('connection', function (socket) {// WebSocket Connection
         //console.log(1); //turn LED on or off, for now we will just show it in console.log
         lightvalue = -1;
         socket.emit("toggle",1);
+        R4.writeSync(0);
+      }else if(lightvalue==5){
+        R4.writeSync(1);
       }
       socket.emit("light",lightvalue+1);
     });
   });
+
+var t = setInterval(blink,500);
+var i = 1;
+function blink(){
+  if(i>=5) i=1;
+  switch(i++){
+    case 1:
+      R1.writeSync(0);
+      R2.writeSync(1);
+      R3.writeSync(1);
+      R4.writeSync(1);
+      break;
+    case 2:
+      R1.writeSync(1);
+      R2.writeSync(0);
+      R3.writeSync(1);
+      R4.writeSync(1);
+      break;
+    case 3:
+      R1.writeSync(1);
+      R2.writeSync(1);
+      R3.writeSync(0);
+      R4.writeSync(1);
+      break;
+    case 4:
+      R1.writeSync(1);
+      R2.writeSync(1);
+      R3.writeSync(1);
+      R4.writeSync(0);
+      break;
+  }
+}
