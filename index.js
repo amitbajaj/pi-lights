@@ -1,8 +1,12 @@
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 5000;
+const IDFILE = '.myid.dat'; //name of the file containing the UUID for instance
+const APPURL = 'https://bajajtech.in/lights'; //URL of the application on the internet
 var http = require('http').createServer(handler); //require http server, and create server with function handler()
 var fs = require('fs'); //require filesystem module
-var io = require('socket.io')(http) //require socket.io module and pass the http object (server)
+var io = require('socket.io')(http); //require socket.io module and pass the http object (server)
 var Gpio = require('onoff').Gpio; //require onoff module to interact with GPIO header
+var uuidv5 = require('uuid/v5'); //require the UUID module to generate the unique UUID for this instance
+
 var R = Array();
 R[0] = new Gpio(26, 'out'); //use GPIO pin 26 for Relay 1, and specify that it is output
 R[1] = new Gpio(19, 'out'); //use GPIO pin 19 for Relay 2, and specify that it is output
@@ -14,19 +18,43 @@ var counter = 1; //Addition factor
 var direction = 1; //addition direction (+1 to move forward, -1 to move backwards)
 var switches = R.length; //Number of relays.
 var isActive = false; //Status of relays
-
+var myId = uuidv5(APURL,uuidv5.URL); //generate a UUID at startup. If an existing UUID is not present, we will use that otherwise we will use this and write it back to the ID file
+fs.exists(__dirname+'/'+IDFILE,()=>{
+  fs.readFile(__dirname + '/'+IDFILE, (err,data)=>{
+      if(err){
+          console.log("Error reading ID");
+          http.close();
+      }else{
+          myId = data;
+      }
+  });      
+});
+fs.writeFile(__dirname+'/'+IDFILE,myId,(err)=>{
+  if(err){
+      console.log("Unable to set the UUID\n"+err.message);
+  }
+});
 http.listen(PORT); //listen to port (either the system or local 5000)
 
 function handler (req, res) { //create server
-  fs.readFile(__dirname + '/public/index.html', function(err, data) { //read file index.html in public folder
-    if (err) {
-      res.writeHead(404, {'Content-Type': 'text/html'}); //display 404 on error
-      return res.end("404 Not Found");
-    }
-    res.writeHead(200, {'Content-Type': 'text/html'}); //write HTML
-    res.write(data); //write data from index.html
+  if(req.url=="/api"){
+    res.writeHead(200, {'Content-Type': 'text/json'}); //write HTML
+    res.write("{'name':'api', 'description': 'The API uri will be used by the IoT devices'}"); //write data from index.html
     return res.end();
-  });
+  }else if(req.url=='/stop'){
+    http.close();
+    process.exit();
+  }else{
+    fs.readFile(__dirname + '/public/index.html', function(err, data) { //read file index.html in public folder
+      if (err) {
+        res.writeHead(404, {'Content-Type': 'text/html'}); //display 404 on error
+        return res.end("404 Not Found");
+      }
+      res.writeHead(200, {'Content-Type': 'text/html'}); //write HTML
+      res.write(data); //write data from index.html
+      return res.end();
+    });  
+  }
 }
 
 io.sockets.on('connection', function (socket) {// WebSocket Connection
