@@ -18,7 +18,7 @@ var counter = 1; //Addition factor
 var direction = 1; //addition direction (+1 to move forward, -1 to move backwards)
 var switches = R.length; //Number of relays.
 var isActive = false; //Status of relays
-var myId = uuidv5(APURL,uuidv5.URL); //generate a UUID at startup. If an existing UUID is not present, we will use that otherwise we will use this and write it back to the ID file
+var myId = uuidv5(APPURL,uuidv5.URL); //generate a UUID at startup. If an existing UUID is not present, we will use that otherwise we will use this and write it back to the ID file
 fs.exists(__dirname+'/'+IDFILE,()=>{
   fs.readFile(__dirname + '/'+IDFILE, (err,data)=>{
       if(err){
