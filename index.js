@@ -57,7 +57,11 @@ function handler (req, res) { //create server
       return res.end();
     });  
   }else{
-    file.serve(req,res);
+    file.serve(req,res, function(e,res){
+      if(e){
+        console.log(e.status);
+      }
+    });
   }
 }
 
