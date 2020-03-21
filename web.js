@@ -5,7 +5,7 @@ var http = require('http').createServer(handler); //require http server, and cre
 var fs = require('fs'); //require filesystem module
 var uuidv5 = require('uuid/v5'); //require the UUID module to generate the unique UUID for this instance
 var webCall = require('request'); //require request module to get/set status on internet
-var myId = uuidv5(APPURL,uuidv5.URL); //generate a UUID at startup. If an existing UUID is not present, we will use that otherwise we will use this and write it back to the ID file
+var myId = uuidv5(APPURL,uuidv5.URL); //generate a UUID at startup. If an existing UUID is present, we will use that otherwise we will use this and write it back to the ID file
 fs.exists(__dirname+'/'+IDFILE,()=>{
     fs.readFile(__dirname + '/'+IDFILE, (err,data)=>{
         if(err){

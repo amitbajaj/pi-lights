@@ -32,7 +32,7 @@
             //     document.getElementById("light").checked = !(document.getElementById("light").checked); //toggle the checkbox state
             // });
             socket.on("status",function(data){
-                document.getElementById("statusval").value = data?"Active":"Inactive";
+                document.getElementById("statusval").value = data?"Activated":"Decactivated";
             });
             socket.on("activated",function(data){
                 document.getElementById("statusval").value = "Activated";
