@@ -6,6 +6,8 @@ var fs = require('fs'); //require filesystem module
 var io = require('socket.io')(http); //require socket.io module and pass the http object (server)
 var Gpio = require('onoff').Gpio; //require onoff module to interact with GPIO header
 var uuidv5 = require('uuid/v5'); //require the UUID module to generate the unique UUID for this instance
+var static = require('node-static'); //require the node-static module to server the static files 
+var file = new static.Server('./static'); //serve static content from a specific folder only
 
 var R = Array();
 R[0] = new Gpio(26, 'out'); //use GPIO pin 26 for Relay 1, and specify that it is output
@@ -44,7 +46,7 @@ function handler (req, res) { //create server
   }else if(req.url=='/stop'){
     http.close();
     process.exit();
-  }else{
+  }else if(req.url=='/' || req.url==''){
     fs.readFile(__dirname + '/public/index.html', function(err, data) { //read file index.html in public folder
       if (err) {
         res.writeHead(404, {'Content-Type': 'text/html'}); //display 404 on error
@@ -54,6 +56,8 @@ function handler (req, res) { //create server
       res.write(data); //write data from index.html
       return res.end();
     });  
+  }else{
+    file.serve(req,res);
   }
 }
 

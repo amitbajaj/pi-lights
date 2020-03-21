@@ -1,9 +1,19 @@
 <!DOCTYPE html>
 <html>
-    <head><title>Welcome to PiLights 1.0</title></head>
+    <head>
+        <title>Welcome to PiLights 1.0</title>
+        <link rel="stylesheet" href="/static/styles.css">
+    </head>
     <body>
         <h1>Control LED light</h1>
-        <p><label for="light">Light Status</label><input type="checkbox" id="light"></p>
+        <p>
+            <label for="light">Light Status</label>
+            <label class="rocker">
+                <input type="checkbox" checked id="light">
+                <span class="switch-left">On</span>
+                <span class="switch-right">Off</span>
+            </label>
+        </p>
         <p><input type="text" id="speedval"></p>
         <p><input type="text" id="statusval"></p>
         <p><input type="button" value="Check" onclick="socket.emit('status');"></p>
