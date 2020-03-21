@@ -15,6 +15,7 @@
         </p>
         <p><input type="text" id="speedval"></p>
         <p><input type="text" id="statusval"></p>
+        <p><input type="text" id="stateval"></p>
         <p><input type="button" value="Check" onclick="socket.emit('status');"></p>
         <p><input type="button" value="Set Speed" onclick="socket.emit('setspeed',document.getElementById('speedval').value);"></p>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script> <!-- include socket.io client side script -->
@@ -30,6 +31,7 @@
                     }
                     // socket.emit("light", Number(this.checked)); //send button status to server (as 1 or 0)
                 });
+                socket.emit("state",null);
                 // socket.emit("status",1);
             });
             // socket.on('light', function (data) { //get button status from client
@@ -50,7 +52,14 @@
             socket.on("deactivated",function(data){
                 document.getElementById("statusval").value = "Decactivated";
             });
+            socket.on("state",function(data){
+                document.getElementById("stateval").value = data;
+                setTimeout(getState,500);
+            });
 
+            function getState(){
+                socket.emit("state",null);
+            }
         </script>
     </body>
 </html>

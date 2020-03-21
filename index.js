@@ -20,7 +20,7 @@ var counter = 1; //Addition factor
 var direction = 1; //addition direction (+1 to move forward, -1 to move backwards)
 var switches = R.length; //Number of relays.
 var isActive = false; //Status of relays
-var myId = uuidv5(APPURL,uuidv5.URL); //generate a UUID at startup. If an existing UUID is not present, we will use that otherwise we will use this and write it back to the ID file
+var myId = uuidv5(APPURL,uuidv5.URL); //generate a UUID at startup. If an existing UUID is present, we will use that otherwise we will use this and write it back to the ID file
 fs.exists(__dirname+'/'+IDFILE,()=>{
   fs.readFile(__dirname + '/'+IDFILE, (err,data)=>{
       if(err){
@@ -29,7 +29,7 @@ fs.exists(__dirname+'/'+IDFILE,()=>{
       }else{
           myId = data;
       }
-  });      
+  });
 });
 fs.writeFile(__dirname+'/'+IDFILE,myId,(err)=>{
   if(err){
@@ -57,11 +57,7 @@ function handler (req, res) { //create server
       return res.end();
     });  
   }else{
-    file.serve(req,res, function(e,res){
-      if(e){
-        console.log(e.status);
-      }
-    });
+    file.serve(req,res);
   }
 }
 
@@ -91,6 +87,13 @@ io.sockets.on('connection', function (socket) {// WebSocket Connection
     });
     socket.on("setspeed",function(data){
       speed=parseInt(data);
+    });
+    socket.on("state", function(data){
+      var state="";
+      for(i=0;i<switches;i++){
+        state+=""+R[i].readSync();
+      }
+      socket.emit("state",state);
     });
   });
 
