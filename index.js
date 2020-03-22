@@ -10,10 +10,22 @@ var static = require('node-static'); //require the node-static module to server 
 var file = new static.Server('./static'); //serve static content from a specific folder only
 
 var R = Array();
+/*** 4 port */
 R[0] = new Gpio(26, 'out'); //use GPIO pin 26 for Relay 1, and specify that it is output
 R[1] = new Gpio(19, 'out'); //use GPIO pin 19 for Relay 2, and specify that it is output
 R[2] = new Gpio(13, 'out'); //use GPIO pin 13 for Relay 3, and specify that it is output
 R[3] = new Gpio(6, 'out');  //use GPIO pin  6 for Relay 4, and specify that it is output
+
+/*** 8 port */
+R[0] = new Gpio(4, 'out');   //use GPIO pin  4 for Relay 1, and specify that it is output
+R[1] = new Gpio(17, 'out');  //use GPIO pin 17 for Relay 2, and specify that it is output
+R[2] = new Gpio(27, 'out');  //use GPIO pin 27 for Relay 3, and specify that it is output
+R[3] = new Gpio(22, 'out');  //use GPIO pin 22 for Relay 4, and specify that it is output
+R[4] = new Gpio(18, 'out');  //use GPIO pin 18 for Relay 5, and specify that it is output
+R[5] = new Gpio(23, 'out');  //use GPIO pin 23 for Relay 6, and specify that it is output
+R[6] = new Gpio(24, 'out');  //use GPIO pin 24 for Relay 7, and specify that it is output
+R[7] = new Gpio(25, 'out');  //use GPIO pin 25 for Relay 8, and specify that it is output
+
 var speed = 500; //Current interval between on and off sequences
 var t; //the Interval Timer handle
 var counter = 1; //Addition factor
