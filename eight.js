@@ -81,6 +81,7 @@ io.sockets.on('connection', function (socket) {// WebSocket Connection
     // });
     socket.on("status",function(data){
       socket.emit("status",isActive);
+      socket.emit("speed",speed);
     });
     socket.on("activate", function(data){
       isActive = true;
@@ -100,6 +101,8 @@ io.sockets.on('connection', function (socket) {// WebSocket Connection
         state+=""+R[i].readSync();
       }
       socket.emit("state",state);
+      socket.emit("status",isActive);
+      socket.emit("speed",speed);
     });
   });
 

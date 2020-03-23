@@ -18,16 +18,19 @@ window.addEventListener("load", function(){ //when page loads
 
 
 socket.on("status",function(data){
-    //document.getElementById("statusval").value = data?"Activated":"Decactivated";
+    light.checked = data;
+});
+socket.on("speed",function(data){
+    speed.value = data;
 });
 socket.on("activated",function(data){
-    document.getElementById("light").checked=true;
+    light.checked=true;
     speed.value = data;
     //document.getElementById("statusval").value = "Activated";
     //document.getElementById("speedval").value = data;
 });
 socket.on("deactivated",function(data){
-    document.getElementById("light").checked=false;
+    light.checked=false;
     //document.getElementById("statusval").value = "Decactivated";
 });
 socket.on("state",function(data){
