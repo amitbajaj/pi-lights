@@ -9,7 +9,7 @@
         <h1 style="text-align: center;">Welcome to PiLights!</h1>
         <p style="text-align: center;"><label class="rocker rocker-tiny"> <input type="checkbox" id="light" /> <span class="switch-left">On</span> <span class="switch-right">Off</span> </label></p>
         <div class="slidecontainer"><input type="range" min="100" max="900" value="500" class="slider" id="myRange" /></div><p></p>
-        <p style="text-align: center;"><span class="led red" id="lights"></span>&nbsp;<span class="led red" id="lights"></span>&nbsp;<span class="led red" id="lights"></span>&nbsp;<span class="led red" id="lights"></span>&nbsp;<span class="led red" id="lights"></span>&nbsp;<span class="led red" id="lights"></span>&nbsp;<span class="led red" id="lights"></span>&nbsp;<span class="led red" id="lights"></span></p>
+        <p style="text-align: center;"><span class="led red" name="lights"></span>&nbsp;<span class="led red" name="lights"></span>&nbsp;<span class="led red" name="lights"></span>&nbsp;<span class="led red" name="lights"></span>&nbsp;<span class="led red" name="lights"></span>&nbsp;<span class="led red" name="lights"></span>&nbsp;<span class="led red" name="lights"></span>&nbsp;<span class="led red" name="lights"></span></p>
 
 
 
@@ -19,47 +19,6 @@
         <p><input type="button" value="Check" onclick="socket.emit('status');"></p>
         <p><input type="button" value="Set Speed" onclick="socket.emit('setspeed',document.getElementById('speedval').value);"></p>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script> <!-- include socket.io client side script -->
-        <script>
-            var socket = io(); //load socket.io-client and connect to the host that serves the page
-            window.addEventListener("load", function(){ //when page loads
-                var lightbox = document.getElementById("light");
-                lightbox.addEventListener("change", function() { //add event listener for when checkbox changes
-                    if(this.checked){
-                        socket.emit("activate",null);
-                    }else{
-                        socket.emit("deactivate",null);
-                    }
-                    // socket.emit("light", Number(this.checked)); //send button status to server (as 1 or 0)
-                });
-                socket.emit("state",null);
-                // socket.emit("status",1);
-            });
-            // socket.on('light', function (data) { //get button status from client
-            //     document.getElementById("lightval").value = data; //change checkbox according to push button on Raspberry Pi
-            //     data=Number(data);
-            //     setTimeout(function(){socket.emit("light",data);},1000);
-            // });
-            // socket.on("toggle",function(data){
-            //     document.getElementById("light").checked = !(document.getElementById("light").checked); //toggle the checkbox state
-            // });
-            socket.on("status",function(data){
-                document.getElementById("statusval").value = data?"Activated":"Decactivated";
-            });
-            socket.on("activated",function(data){
-                document.getElementById("statusval").value = "Activated";
-                document.getElementById("speedval").value = data;
-            });
-            socket.on("deactivated",function(data){
-                document.getElementById("statusval").value = "Decactivated";
-            });
-            socket.on("state",function(data){
-                document.getElementById("stateval").value = data;
-                setTimeout(getState,500);
-            });
-
-            function getState(){
-                socket.emit("state",null);
-            }
-        </script>
+        <script src="scripts/pilights.js"></script>
     </body>
 </html>
