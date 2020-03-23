@@ -23,6 +23,7 @@ socket.on("deactivated",function(data){
 });
 socket.on("state",function(data){
     document.getElementById("stateval").value = data;
+    showState(data)
     setTimeout(getState,500);
 });
 
@@ -32,15 +33,15 @@ function getState(){
 
 function showState(data){
     var lights = document.getElementsByName("lights");
-    for(i=0;i<lights.length();i++){
+    for(i=0;i<lights.length;i++){
         if(i>=data.length){
             lights[i].style.display="none";
         }else if (data[i]=="0"){
-            lights[i].style.display="block";
-            ligths[i].className="led green";
+            lights[i].style.display="inline-block";
+            lights[i].className="led green";
         }else{
-            lights[i].style.display="block";
-            ligths[i].className="led red";
+            lights[i].style.display="inline-block";
+            lights[i].className="led red";
         }
     }
 }
