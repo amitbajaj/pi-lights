@@ -30,8 +30,12 @@ socket.on("deactivated",function(data){
 });
 socket.on("state",function(data){
     //document.getElementById("stateval").value = data;
+    var interval=500;
+    if (speed!=null){
+        interval = speed.value;
+    }
     showState(data)
-    setTimeout(getState,500);
+    setTimeout(getState,interval);
 });
 
 function getState(){
