@@ -11,6 +11,13 @@ window.addEventListener("load", function(){ //when page loads
     socket.emit("state",null);
 });
 
+var speed = document.getElementById("speed");
+if (speed!=null){
+    speed.oninput = function(){
+        socket.emit('setspeed',this.value);
+    }
+}
+
 socket.on("status",function(data){
     document.getElementById("statusval").value = data?"Activated":"Decactivated";
 });

@@ -1,14 +1,4 @@
-const PORT = process.env.PORT || 5000;
-const IDFILE = '.myid.dat'; //name of the file containing the UUID for instance
-const APPURL = 'https://bajajtech.in/lights'; //URL of the application on the internet
-var http = require('http').createServer(handler); //require http server, and create server with function handler()
-var fs = require('fs'); //require filesystem module
-var io = require('socket.io')(http); //require socket.io module and pass the http object (server)
 var Gpio = require('onoff').Gpio; //require onoff module to interact with GPIO header
-var uuidv5 = require('uuid/v5'); //require the UUID module to generate the unique UUID for this instance
-var static = require('node-static'); //require the node-static module to server the static files 
-var file = new static.Server('./static'); //serve static content from a specific folder only
-
 var R = Array();
 /*** 8 port */
 R[0] = new Gpio(4, 'out');   //use GPIO pin  4 for Relay 1, and specify that it is output
@@ -19,6 +9,16 @@ R[4] = new Gpio(18, 'out');  //use GPIO pin 18 for Relay 5, and specify that it 
 R[5] = new Gpio(23, 'out');  //use GPIO pin 23 for Relay 6, and specify that it is output
 R[6] = new Gpio(24, 'out');  //use GPIO pin 24 for Relay 7, and specify that it is output
 R[7] = new Gpio(25, 'out');  //use GPIO pin 25 for Relay 8, and specify that it is output
+
+const PORT = process.env.PORT || 5000;
+const IDFILE = '.myid.dat'; //name of the file containing the UUID for instance
+const APPURL = 'https://bajajtech.in/lights'; //URL of the application on the internet
+var http = require('http').createServer(handler); //require http server, and create server with function handler()
+var fs = require('fs'); //require filesystem module
+var io = require('socket.io')(http); //require socket.io module and pass the http object (server)
+var uuidv5 = require('uuid/v5'); //require the UUID module to generate the unique UUID for this instance
+var static = require('node-static'); //require the node-static module to server the static files 
+var file = new static.Server('./static'); //serve static content from a specific folder only
 
 var speed = 500; //Current interval between on and off sequences
 var t; //the Interval Timer handle

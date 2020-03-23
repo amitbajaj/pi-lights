@@ -1,20 +1,20 @@
-const PORT = process.env.PORT || 5000;
-const IDFILE = '.myid.dat'; //name of the file containing the UUID for instance
-const APPURL = 'https://bajajtech.in/lights'; //URL of the application on the internet
-var http = require('http').createServer(handler); //require http server, and create server with function handler()
-var fs = require('fs'); //require filesystem module
-var io = require('socket.io')(http); //require socket.io module and pass the http object (server)
 var Gpio = require('onoff').Gpio; //require onoff module to interact with GPIO header
-var uuidv5 = require('uuid/v5'); //require the UUID module to generate the unique UUID for this instance
-var static = require('node-static'); //require the node-static module to server the static files 
-var file = new static.Server('./static'); //serve static content from a specific folder only
-
 var R = Array();
 /*** 4 port */
 R[0] = new Gpio(26, 'out'); //use GPIO pin 26 for Relay 1, and specify that it is output
 R[1] = new Gpio(19, 'out'); //use GPIO pin 19 for Relay 2, and specify that it is output
 R[2] = new Gpio(13, 'out'); //use GPIO pin 13 for Relay 3, and specify that it is output
 R[3] = new Gpio(6, 'out');  //use GPIO pin  6 for Relay 4, and specify that it is output
+
+const PORT = process.env.PORT || 5000;
+const IDFILE = '.myid.dat'; //name of the file containing the UUID for instance
+const APPURL = 'https://bajajtech.in/lights'; //URL of the application on the internet
+var http = require('http').createServer(handler); //require http server, and create server with function handler()
+var fs = require('fs'); //require filesystem module
+var io = require('socket.io')(http); //require socket.io module and pass the http object (server)
+var uuidv5 = require('uuid/v5'); //require the UUID module to generate the unique UUID for this instance
+var static = require('node-static'); //require the node-static module to server the static files 
+var file = new static.Server('./static'); //serve static content from a specific folder only
 
 var speed = 500; //Current interval between on and off sequences
 var t; //the Interval Timer handle
