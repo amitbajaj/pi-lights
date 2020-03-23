@@ -19,17 +19,17 @@ if (speed!=null){
 }
 
 socket.on("status",function(data){
-    document.getElementById("statusval").value = data?"Activated":"Decactivated";
+    //document.getElementById("statusval").value = data?"Activated":"Decactivated";
 });
 socket.on("activated",function(data){
-    document.getElementById("statusval").value = "Activated";
-    document.getElementById("speedval").value = data;
+    //document.getElementById("statusval").value = "Activated";
+    //document.getElementById("speedval").value = data;
 });
 socket.on("deactivated",function(data){
-    document.getElementById("statusval").value = "Decactivated";
+    //document.getElementById("statusval").value = "Decactivated";
 });
 socket.on("state",function(data){
-    document.getElementById("stateval").value = data;
+    //document.getElementById("stateval").value = data;
     showState(data)
     setTimeout(getState,500);
 });
