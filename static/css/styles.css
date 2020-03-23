@@ -322,7 +322,7 @@ html {
   }
   
   .slidecontainer {
-    width: 100%; /* Width of the outside container */
+    width: 75%; /* Width of the outside container */
   }
   
   /* The slider itself */
