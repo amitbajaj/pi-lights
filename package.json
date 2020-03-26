@@ -15,7 +15,8 @@
     "socket.io": "^2.3.0",
     "uuid": "^3.3.3",
     "node-static": "*",
-    "got": "*"
+    "got": "*",
+    "form-data": "*"
   },
   "repository": {
     "type": "git",
