@@ -8,13 +8,14 @@ R[3] = new Gpio(6, 'out');  //use GPIO pin  6 for Relay 4, and specify that it i
 
 const PORT = process.env.PORT || 5000;
 const IDFILE = '.myid.dat'; //name of the file containing the UUID for instance
-const APPURL = 'https://bajajtech.in/lights'; //URL of the application on the internet
-var http = require('http').createServer(handler); //require http server, and create server with function handler()
-var fs = require('fs'); //require filesystem module
-var io = require('socket.io')(http); //require socket.io module and pass the http object (server)
-var uuidv5 = require('uuid/v5'); //require the UUID module to generate the unique UUID for this instance
-var static = require('node-static'); //require the node-static module to server the static files 
-var file = new static.Server('./static'); //serve static content from a specific folder only
+const http = require('http').createServer(handler); //require http server, and create server with function handler()
+const fs = require('fs'); //require filesystem module
+const io = require('socket.io')(http); //require socket.io module and pass the http object (server)
+const uuidv5 = require('uuid/v5'); //require the UUID module to generate the unique UUID for this instance
+const static = require('node-static'); //require the node-static module to server the static files 
+const file = new static.Server('./static'); //serve static content from a specific folder only
+const got = require('got');
+const ONLINE_CHECK_INTEVAL = 1000; //millisecond after which to check the status from online URL
 
 var speed = 500; //Current interval between on and off sequences
 var t; //the Interval Timer handle
@@ -38,6 +39,8 @@ fs.writeFile(__dirname+'/'+IDFILE,myId,(err)=>{
       console.log("Unable to set the UUID\n"+err.message);
   }
 });
+const APPURL = 'https://bajajtech.in/lights/api.php?uuid='+escape(myId); //URL of the application on the internet
+
 http.listen(PORT); //listen to port (either the system or local 5000)
 
 function handler (req, res) { //create server
@@ -122,3 +125,15 @@ function blink(){
     switchoff();
   }
 }
+
+function getOnlineStatus(){
+  got(APPURL, { json: true }).then(response => {
+    console.log(response.status);
+    console.log(response);
+  }).catch(error => {
+    console.log(error);
+  });
+  setTimeout(getOnlineStatus,ONLINE_CHECK_INTEVAL);  
+}
+
+setTimeout(getOnlineStatus,ONLINE_CHECK_INTEVAL);
