@@ -138,60 +138,60 @@ function getOnlineStatus(){
   formData.append('name',MYNAME);
 
 
-  (async () => {
-    const {response} = await got.post(APPURL, {body:formData, responseType: 'json'});
-    switch (response.status){
-      case 'success':
-        switch(response.action){
-          case 'start':
-            if(!isActive){
-              isActive=true;
-              blink();
-            }
-            break;
-          case 'stop':
-            isActive=false;
-            break;
-          case 'speed':
-            speed=parseInt(response.value);
-            break;
-        }
-        break;
-      case 'fail':
-        break;
-    }
-    setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
-})();
+  // (async () => {
+  //   const {response} = await got.post(APPURL, {body:formData, responseType: 'json'});
+  //   switch (response.status){
+  //     case 'success':
+  //       switch(response.action){
+  //         case 'start':
+  //           if(!isActive){
+  //             isActive=true;
+  //             blink();
+  //           }
+  //           break;
+  //         case 'stop':
+  //           isActive=false;
+  //           break;
+  //         case 'speed':
+  //           speed=parseInt(response.value);
+  //           break;
+  //       }
+  //       break;
+  //     case 'fail':
+  //       break;
+  //   }
+  //   setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
+  // })();
 
 
-  // got.post(APPURL,{body:formData})
-  //   .json()
-  //   .then(response => {
-  //     switch (response.status){
-  //       case 'success':
-  //         switch(response.action){
-  //           case 'start':
-  //             if(!isActive){
-  //               isActive=true;
-  //               blink();
-  //             }
-  //             break;
-  //           case 'stop':
-  //             isActive=false;
-  //             break;
-  //           case 'speed':
-  //             speed=parseInt(response.value);
-  //             break;
-  //         }
-  //         break;
-  //       case 'fail':
-  //         break;
-  //     }
-  //     setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
-  //   })
-  //   .catch(error => {
-  //     console.log(error);
-  //     setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
-  //   });
+  got.post(APPURL,{body:formData})
+    .json()
+    .then(response => {
+      switch (response.status){
+        case 'success':
+          switch(response.action){
+            case 'start':
+              if(!isActive){
+                isActive=true;
+                blink();
+              }
+              break;
+            case 'stop':
+              isActive=false;
+              break;
+            case 'speed':
+              speed=parseInt(response.value);
+              break;
+          }
+          break;
+        case 'fail':
+          break;
+      }
+      setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
+    })
+    .catch(error => {
+      console.log(error);
+      setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
+    });
 }
 setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);
