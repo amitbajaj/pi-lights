@@ -14,6 +14,7 @@ const MYNAME = 'Eight Port Relay';
 const PORT = process.env.PORT || 5000;
 const IDFILE = '.myid.dat'; //name of the file containing the UUID for instance
 const http = require('http').createServer(handler); //require http server, and create server with function handler()
+const https = require('https'); // required to send post requests to API Server
 const fs = require('fs'); //require filesystem module
 const io = require('socket.io')(http); //require socket.io module and pass the http object (server)
 const uuidv5 = require('uuid/v5'); //require the UUID module to generate the unique UUID for this instance
@@ -132,65 +133,73 @@ function blink(){
   }
 }
 
+// function getOnlineStatus(){
+//   var formData = new FormData();
+//   console.log
+//   formData.append('uuid',myId);
+
+//   formData.append('name',MYNAME);
+
+//   (async () => {
+//     const {response} = await got.post(APPURL, {form:formData, responseType: 'json'});
+//     console.log(response);
+//     switch (response.status){
+//       case 'success':
+//         switch(response.action){
+//           case 'start':
+//             if(!isActive){
+//               isActive=true;
+//               blink();
+//             }
+//             break;
+//           case 'stop':
+//             isActive=false;
+//             break;
+//           case 'speed':
+//             speed=parseInt(response.value);
+//             break;
+//         }
+//         break;
+//       case 'fail':
+//         break;
+//     }
+//     setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
+//   })();
+// }
+
 function getOnlineStatus(){
-  var formData = new FormData();
-  formData.append('uuid',myId);
-  formData.append('name',MYNAME);
-
-  (async () => {
-    const {response} = await got.post(APPURL, {form:formData, responseType: 'json'});
-    switch (response.status){
-      case 'success':
-        switch(response.action){
-          case 'start':
-            if(!isActive){
-              isActive=true;
-              blink();
-            }
-            break;
-          case 'stop':
-            isActive=false;
-            break;
-          case 'speed':
-            speed=parseInt(response.value);
-            break;
-        }
-        break;
-      case 'fail':
-        break;
+  const data = JSON.stringify({
+    name: MYNAME,
+    uuid: myId
+  });
+  
+  const options = {
+    hostname: 'bajajtech.in',
+    port: 443,
+    path: '/lights/post.php',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': data.length
     }
-    setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
-  })();
-
-
-  // got.post(APPURL,{body:formData})
-  //   .json()
-  //   .then(response => {
-  //     switch (response.status){
-  //       case 'success':
-  //         switch(response.action){
-  //           case 'start':
-  //             if(!isActive){
-  //               isActive=true;
-  //               blink();
-  //             }
-  //             break;
-  //           case 'stop':
-  //             isActive=false;
-  //             break;
-  //           case 'speed':
-  //             speed=parseInt(response.value);
-  //             break;
-  //         }
-  //         break;
-  //       case 'fail':
-  //         break;
-  //     }
-  //     setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
-  //   })
-  //   .catch(error => {
-  //     console.log(error);
-  //     setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
-  //   });
+  };
+  
+  const req = https.request(options, (res) => {
+    console.log(`statusCode: ${res.statusCode}`);
+  
+    res.on('data', (d) => {
+      respData = JSON.parse(d);
+      setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);
+      console.log(respData.data+':'+respData.value);
+    })
+  })
+  
+  req.on('error', (error) => {
+    console.error(error);
+  });
+  
+  req.write(data);
+  req.end();  
 }
+
 setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);
