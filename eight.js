@@ -9,6 +9,7 @@ R[4] = new Gpio(18, 'out');  //use GPIO pin 18 for Relay 5, and specify that it 
 R[5] = new Gpio(23, 'out');  //use GPIO pin 23 for Relay 6, and specify that it is output
 R[6] = new Gpio(24, 'out');  //use GPIO pin 24 for Relay 7, and specify that it is output
 R[7] = new Gpio(25, 'out');  //use GPIO pin 25 for Relay 8, and specify that it is output
+const MYNAME = 'Eight Port Relay';
 
 const PORT = process.env.PORT || 5000;
 const IDFILE = '.myid.dat'; //name of the file containing the UUID for instance
@@ -134,6 +135,7 @@ function blink(){
 function getOnlineStatus(){
   var formData = new FormData();
   formData.append('uuid',myId);
+  formData.append('name',MYNAME);
   got.post(APPURL,{body:formData})
     .json()
     .then(response => {
