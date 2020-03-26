@@ -21,7 +21,7 @@ const static = require('node-static'); //require the node-static module to serve
 const file = new static.Server('./static'); //serve static content from a specific folder only
 const got = require('got'); //got library for calling API calls
 const FormData = require('form-data'); //form-data library for sending formdata in got API calls
-const ONLINE_CHECK_INTEVAL = 1000; //millisecond after which to check the status from online URL
+const ONLINE_CHECK_INTERVAL = 1000; //millisecond after which to check the status from online URL
 const MYDOMAIN = "https://bajajtech.in/lights"; // namespace for UUID and APPURL
 var speed = 500; //Current interval between on and off sequences
 var t; //the Interval Timer handle
@@ -136,33 +136,62 @@ function getOnlineStatus(){
   var formData = new FormData();
   formData.append('uuid',myId);
   formData.append('name',MYNAME);
-  got.post(APPURL,{body:formData})
-    .json()
-    .then(response => {
-      switch (response.status){
-        case 'success':
-          switch(response.action){
-            case 'start':
-              if(!isActive){
-                isActive=true;
-                blink();
-              }
-              break;
-            case 'stop':
-              isActive=false;
-              break;
-            case 'speed':
-              speed=parseInt(response.value);
-              break;
-          }
-          break;
-        case 'fail':
-          break;
-      }
-    })
-    .catch(error => {
-      console.log(error);
-    });
-  setTimeout(getOnlineStatus,ONLINE_CHECK_INTEVAL);  
+
+
+  (async () => {
+    const {response} = await got.post(APPURL, {body:formData, responseType: 'json'});
+    switch (response.status){
+      case 'success':
+        switch(response.action){
+          case 'start':
+            if(!isActive){
+              isActive=true;
+              blink();
+            }
+            break;
+          case 'stop':
+            isActive=false;
+            break;
+          case 'speed':
+            speed=parseInt(response.value);
+            break;
+        }
+        break;
+      case 'fail':
+        break;
+    }
+    setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
+})();
+
+
+  // got.post(APPURL,{body:formData})
+  //   .json()
+  //   .then(response => {
+  //     switch (response.status){
+  //       case 'success':
+  //         switch(response.action){
+  //           case 'start':
+  //             if(!isActive){
+  //               isActive=true;
+  //               blink();
+  //             }
+  //             break;
+  //           case 'stop':
+  //             isActive=false;
+  //             break;
+  //           case 'speed':
+  //             speed=parseInt(response.value);
+  //             break;
+  //         }
+  //         break;
+  //       case 'fail':
+  //         break;
+  //     }
+  //     setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
+  //   })
+  //   .catch(error => {
+  //     console.log(error);
+  //     setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
+  //   });
 }
-setTimeout(getOnlineStatus,ONLINE_CHECK_INTEVAL);
+setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);
