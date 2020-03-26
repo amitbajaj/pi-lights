@@ -20,14 +20,14 @@ const static = require('node-static'); //require the node-static module to serve
 const file = new static.Server('./static'); //serve static content from a specific folder only
 const got = require('got');
 const ONLINE_CHECK_INTEVAL = 1000; //millisecond after which to check the status from online URL
-
+const MYDOMAIN = "https://bajajtech.in/lights"; // namespace for UUID and APPURL
 var speed = 500; //Current interval between on and off sequences
 var t; //the Interval Timer handle
 var counter = 1; //Addition factor
 var direction = 1; //addition direction (+1 to move forward, -1 to move backwards)
 var switches = R.length; //Number of relays.
 var isActive = false; //Status of relays
-var myId = uuidv5(APPURL,uuidv5.URL); //generate a UUID at startup. If an existing UUID is present, we will use that otherwise we will use this and write it back to the ID file
+var myId = uuidv5(MYDOMAIN,uuidv5.URL); //generate a UUID at startup. If an existing UUID is present, we will use that otherwise we will use this and write it back to the ID file
 fs.exists(__dirname+'/'+IDFILE,()=>{
   fs.readFile(__dirname + '/'+IDFILE, (err,data)=>{
       if(err){
@@ -43,7 +43,7 @@ fs.writeFile(__dirname+'/'+IDFILE,myId,(err)=>{
       console.log("Unable to set the UUID\n"+err.message);
   }
 });
-const APPURL = 'https://bajajtech.in/lights/api.php?uuid='+escape(myId); //URL of the application on the internet
+const APPURL = MYDOMAIN+'/api.php?uuid='+escape(myId); //URL of the application on the internet
 
 http.listen(PORT); //listen to port (either the system or local 5000)
 
