@@ -18,7 +18,8 @@ const io = require('socket.io')(http); //require socket.io module and pass the h
 const uuidv5 = require('uuid/v5'); //require the UUID module to generate the unique UUID for this instance
 const static = require('node-static'); //require the node-static module to server the static files 
 const file = new static.Server('./static'); //serve static content from a specific folder only
-const got = require('got');
+const got = require('got'); //got library for calling API calls
+const FormData = require('form-data'); //form-data library for sending formdata in got API calls
 const ONLINE_CHECK_INTEVAL = 1000; //millisecond after which to check the status from online URL
 const MYDOMAIN = "https://bajajtech.in/lights"; // namespace for UUID and APPURL
 var speed = 500; //Current interval between on and off sequences
@@ -43,7 +44,7 @@ fs.writeFile(__dirname+'/'+IDFILE,myId,(err)=>{
       console.log("Unable to set the UUID\n"+err.message);
   }
 });
-const APPURL = MYDOMAIN+'/api.php?uuid='+escape(myId); //URL of the application on the internet
+const APPURL = MYDOMAIN+'/api.php'; //URL of the application on the internet
 
 http.listen(PORT); //listen to port (either the system or local 5000)
 
@@ -131,7 +132,9 @@ function blink(){
 }
 
 function getOnlineStatus(){
-  got(APPURL)
+  var formData = new FormData();
+  formData.append('uuid',myId);
+  got.post(APPURL,{body:formData})
     .json()
     .then(response => {
       switch (response.status){
