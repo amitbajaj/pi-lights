@@ -140,7 +140,7 @@ function getOnlineStatus(){
             case 'start':
               if(!isActive){
                 isActive=true;
-                blink;
+                blink();
               }
               break;
             case 'stop':
