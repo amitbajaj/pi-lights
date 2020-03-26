@@ -131,13 +131,33 @@ function blink(){
 }
 
 function getOnlineStatus(){
-  got(APPURL, { json: true }).then(response => {
-    console.log(response.status);
-    console.log(response);
-  }).catch(error => {
-    console.log(error);
-  });
+  got(APPURL)
+    .json()
+    .then(response => {
+      switch (response.status){
+        case 'success':
+          switch(response.action){
+            case 'start':
+              if(!isActive){
+                isActive=true;
+                blink;
+              }
+              break;
+            case 'stop':
+              isActive=false;
+              break;
+            case 'speed':
+              speed=parseInt(response.value);
+              break;
+          }
+          break;
+        case 'fail':
+          break;
+      }
+    })
+    .catch(error => {
+      console.log(error);
+    });
   setTimeout(getOnlineStatus,ONLINE_CHECK_INTEVAL);  
 }
-
 setTimeout(getOnlineStatus,ONLINE_CHECK_INTEVAL);
