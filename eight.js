@@ -30,14 +30,14 @@ var counter = 1; //Addition factor
 var direction = 1; //addition direction (+1 to move forward, -1 to move backwards)
 var switches = R.length; //Number of relays.
 var isActive = false; //Status of relays
-var myId = uuidv5(MYDOMAIN,uuidv5.URL); //generate a UUID at startup. If an existing UUID is present, we will use that otherwise we will use this and write it back to the ID file
+var myId = uuidv5(MYDOMAIN,uuidv5.URL).toString(); //generate a UUID at startup. If an existing UUID is present, we will use that otherwise we will use this and write it back to the ID file
 fs.exists(__dirname+'/'+IDFILE,()=>{
   fs.readFile(__dirname + '/'+IDFILE, (err,data)=>{
       if(err){
           console.log("Error reading ID");
           http.close();
       }else{
-          myId = data;
+          myId = data.toString();
       }
   });
 });
@@ -176,7 +176,7 @@ function getOnlineStatus(){
   const options = {
     hostname: 'bajajtech.in',
     port: 443,
-    path: '/lights/post.php',
+    path: '/lights/api.php',
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -185,14 +185,33 @@ function getOnlineStatus(){
   };
   
   const req = https.request(options, (res) => {
-    console.log(`statusCode: ${res.statusCode}`);
-  
-    res.on('data', (d) => {
-      respData = JSON.parse(d);
-      setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);
-      console.log(respData.data+':'+respData.value);
-    })
-  })
+    if(res.statusCode==200){
+      res.on('data', (d) => {
+        response = JSON.parse(d);
+        switch (response.status){
+          case 'success':
+            switch(response.action){
+              case 'start':
+                if(!isActive){
+                  isActive=true;
+                  blink();
+                }
+                break;
+              case 'stop':
+                isActive=false;
+                break;
+              case 'speed':
+                speed=parseInt(response.value);
+                break;
+            }
+            break;
+          case 'fail':
+            break;
+        }
+      });
+    }
+    setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
+  });
   
   req.on('error', (error) => {
     console.error(error);
