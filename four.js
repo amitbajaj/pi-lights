@@ -5,32 +5,35 @@ R[0] = new Gpio(26, 'out'); //use GPIO pin 26 for Relay 1, and specify that it i
 R[1] = new Gpio(19, 'out'); //use GPIO pin 19 for Relay 2, and specify that it is output
 R[2] = new Gpio(13, 'out'); //use GPIO pin 13 for Relay 3, and specify that it is output
 R[3] = new Gpio(6, 'out');  //use GPIO pin  6 for Relay 4, and specify that it is output
+const MYNAME = 'Four Port Relay';
 
 const PORT = process.env.PORT || 5000;
 const IDFILE = '.myid.dat'; //name of the file containing the UUID for instance
 const http = require('http').createServer(handler); //require http server, and create server with function handler()
+const https = require('https'); // required to send post requests to API Server
 const fs = require('fs'); //require filesystem module
 const io = require('socket.io')(http); //require socket.io module and pass the http object (server)
 const uuidv5 = require('uuid/v5'); //require the UUID module to generate the unique UUID for this instance
 const static = require('node-static'); //require the node-static module to server the static files 
 const file = new static.Server('./static'); //serve static content from a specific folder only
-const got = require('got');
-const ONLINE_CHECK_INTEVAL = 1000; //millisecond after which to check the status from online URL
-
+const got = require('got'); //got library for calling API calls
+const FormData = require('form-data'); //form-data library for sending formdata in got API calls
+const ONLINE_CHECK_INTERVAL = 1000; //millisecond after which to check the status from online URL
+const MYDOMAIN = "https://bajajtech.in/lights"; // namespace for UUID and APPURL
 var speed = 500; //Current interval between on and off sequences
 var t; //the Interval Timer handle
 var counter = 1; //Addition factor
 var direction = 1; //addition direction (+1 to move forward, -1 to move backwards)
 var switches = R.length; //Number of relays.
 var isActive = false; //Status of relays
-var myId = uuidv5(APPURL,uuidv5.URL); //generate a UUID at startup. If an existing UUID is present, we will use that otherwise we will use this and write it back to the ID file
+var myId = uuidv5(MYDOMAIN,uuidv5.URL).toString(); //generate a UUID at startup. If an existing UUID is present, we will use that otherwise we will use this and write it back to the ID file
 fs.exists(__dirname+'/'+IDFILE,()=>{
   fs.readFile(__dirname + '/'+IDFILE, (err,data)=>{
       if(err){
           console.log("Error reading ID");
           http.close();
       }else{
-          myId = data;
+          myId = data.toString();
       }
   });
 });
@@ -39,7 +42,7 @@ fs.writeFile(__dirname+'/'+IDFILE,myId,(err)=>{
       console.log("Unable to set the UUID\n"+err.message);
   }
 });
-const APPURL = 'https://bajajtech.in/lights/api.php?uuid='+escape(myId); //URL of the application on the internet
+const APPURL = MYDOMAIN+'/api.php'; //URL of the application on the internet
 
 http.listen(PORT); //listen to port (either the system or local 5000)
 
@@ -126,14 +129,92 @@ function blink(){
   }
 }
 
+// function getOnlineStatus(){
+//   var formData = new FormData();
+//   console.log
+//   formData.append('uuid',myId);
+
+//   formData.append('name',MYNAME);
+
+//   (async () => {
+//     const {response} = await got.post(APPURL, {form:formData, responseType: 'json'});
+//     console.log(response);
+//     switch (response.status){
+//       case 'success':
+//         switch(response.action){
+//           case 'start':
+//             if(!isActive){
+//               isActive=true;
+//               blink();
+//             }
+//             break;
+//           case 'stop':
+//             isActive=false;
+//             break;
+//           case 'speed':
+//             speed=parseInt(response.value);
+//             break;
+//         }
+//         break;
+//       case 'fail':
+//         break;
+//     }
+//     setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
+//   })();
+// }
+
 function getOnlineStatus(){
-  got(APPURL, { json: true }).then(response => {
-    console.log(response.status);
-    console.log(response);
-  }).catch(error => {
-    console.log(error);
+  const data = JSON.stringify({
+    name: MYNAME,
+    uuid: myId
   });
-  setTimeout(getOnlineStatus,ONLINE_CHECK_INTEVAL);  
+  
+  const options = {
+    hostname: 'bajajtech.in',
+    port: 443,
+    path: '/lights/api.php',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': data.length
+    }
+  };
+  
+  const req = https.request(options, (res) => {
+    if(res.statusCode==200){
+      res.on('data', (d) => {
+        response = JSON.parse(d);
+        switch (response.status){
+          case 'success':
+            switch(response.action){
+              case 'start':
+                if(!isActive){
+                  isActive=true;
+                  blink();
+                }
+                break;
+              case 'stop':
+                isActive=false;
+                break;
+              case 'speed':
+                speed=parseInt(response.value);
+                break;
+            }
+            break;
+          case 'fail':
+            break;
+        }
+      });
+    }
+    setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
+  });
+  
+  req.on('error', (error) => {
+    console.error(error);
+  });
+  
+  req.write(data);
+  req.end();  
 }
 
-setTimeout(getOnlineStatus,ONLINE_CHECK_INTEVAL);
+setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);
