@@ -9,7 +9,7 @@ R[4] = new Gpio(18, 'out');  //use GPIO pin 18 for Relay 5, and specify that it 
 R[5] = new Gpio(23, 'out');  //use GPIO pin 23 for Relay 6, and specify that it is output
 R[6] = new Gpio(24, 'out');  //use GPIO pin 24 for Relay 7, and specify that it is output
 R[7] = new Gpio(25, 'out');  //use GPIO pin 25 for Relay 8, and specify that it is output
-const MYNAME = 'Eight Port Relay';
+const MYNAME = 'Eight-Port-Relay';
 
 const PORT = process.env.PORT || 5000;
 const IDFILE = '.myid.dat'; //name of the file containing the UUID for instance
@@ -17,7 +17,7 @@ const http = require('http').createServer(handler); //require http server, and c
 const https = require('https'); // required to send post requests to API Server
 const fs = require('fs'); //require filesystem module
 const io = require('socket.io')(http); //require socket.io module and pass the http object (server)
-const uuidv5 = require('uuid/v5'); //require the UUID module to generate the unique UUID for this instance
+const {v5:uuidv5} = require('uuid'); //require the UUID module to generate the unique UUID for this instance
 const static = require('node-static'); //require the node-static module to server the static files 
 const file = new static.Server('./static'); //serve static content from a specific folder only
 const got = require('got'); //got library for calling API calls
@@ -30,7 +30,7 @@ var counter = 1; //Addition factor
 var direction = 1; //addition direction (+1 to move forward, -1 to move backwards)
 var switches = R.length; //Number of relays.
 var isActive = false; //Status of relays
-var myId = uuidv5(MYDOMAIN,uuidv5.URL).toString(); //generate a UUID at startup. If an existing UUID is present, we will use that otherwise we will use this and write it back to the ID file
+var myId = uuidv5(MYDOMAIN+'/'+MYNAME,uuidv5.URL).toString(); //generate a UUID at startup. If an existing UUID is present, we will use that otherwise we will use this and write it back to the ID file
 fs.exists(__dirname+'/'+IDFILE,()=>{
   fs.readFile(__dirname + '/'+IDFILE, (err,data)=>{
       if(err){
