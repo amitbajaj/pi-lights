@@ -176,7 +176,7 @@ function getOnlineStatus(){
   const options = {
     hostname: 'bajajtech.in',
     port: 443,
-    path: '/lights/api.php',
+    path: '/lights/code/api.php',
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
