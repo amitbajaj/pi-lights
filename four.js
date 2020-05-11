@@ -199,6 +199,14 @@ function getOnlineStatus(){
               case 'speed':
                 speed=parseInt(response.value);
                 break;
+              case 'flip':
+                iNum = parseInt(response.value)
+                if(R[iNum].readSync()==0){
+                  R[iNum].writeSync(1);
+                }else{
+                  R[iNum].writeSync(0);
+                }
+                break;
             }
             break;
           case 'fail':
