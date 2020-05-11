@@ -13,7 +13,7 @@ const http = require('http').createServer(handler); //require http server, and c
 const https = require('https'); // required to send post requests to API Server
 const fs = require('fs'); //require filesystem module
 const io = require('socket.io')(http); //require socket.io module and pass the http object (server)
-const {v5: uuidv5} = require('uuid'); //require the UUID module to generate the unique UUID for this instance
+const {v4: uuidv4} = require('uuid'); //require the UUID module to generate the unique UUID for this instance
 const static = require('node-static'); //require the node-static module to server the static files 
 const file = new static.Server('./static'); //serve static content from a specific folder only
 const got = require('got'); //got library for calling API calls
@@ -26,7 +26,7 @@ var counter = 1; //Addition factor
 var direction = 1; //addition direction (+1 to move forward, -1 to move backwards)
 var switches = R.length; //Number of relays.
 var isActive = false; //Status of relays
-var myId = uuidv5(MYDOMAIN+'/'+MYNAME,uuidv5.URL).toString(); //generate a UUID at startup. If an existing UUID is present, we will use that otherwise we will use this and write it back to the ID file
+var myId = uuidv4().toString(); //generate a UUID at startup. If an existing UUID is present, we will use that otherwise we will use this and write it back to the ID file
 fs.exists(__dirname+'/'+IDFILE,()=>{
   fs.readFile(__dirname + '/'+IDFILE, (err,data)=>{
       if(err){
