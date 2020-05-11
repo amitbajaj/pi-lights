@@ -70,17 +70,7 @@ function handler (req, res) { //create server
 }
 
 io.sockets.on('connection', function (socket) {// WebSocket Connection
-    // var lightvalue = 0; //static variable for current status
-    // socket.on('light', function(data) { //get light switch status from client
-    //   lightvalue = data;
-    //   if (lightvalue>=10) {
-    //     //console.log(1); //turn LED on or off, for now we will just show it in console.log
-    //     lightvalue = -1;
-    //     socket.emit("toggle",1);
-    //   }else if(lightvalue==5){
-    //   }
-    //   socket.emit("light",lightvalue+1);
-    // });
+
     socket.on("status",function(data){
       socket.emit("status",isActive);
       socket.emit("speed",speed);
@@ -129,40 +119,6 @@ function blink(){
   }
 }
 
-// function getOnlineStatus(){
-//   var formData = new FormData();
-//   console.log
-//   formData.append('uuid',myId);
-
-//   formData.append('name',MYNAME);
-
-//   (async () => {
-//     const {response} = await got.post(APPURL, {form:formData, responseType: 'json'});
-//     console.log(response);
-//     switch (response.status){
-//       case 'success':
-//         switch(response.action){
-//           case 'start':
-//             if(!isActive){
-//               isActive=true;
-//               blink();
-//             }
-//             break;
-//           case 'stop':
-//             isActive=false;
-//             break;
-//           case 'speed':
-//             speed=parseInt(response.value);
-//             break;
-//         }
-//         break;
-//       case 'fail':
-//         break;
-//     }
-//     setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
-//   })();
-// }
-
 function getOnlineStatus(){
   const data = JSON.stringify({
     name: MYNAME,
@@ -201,10 +157,12 @@ function getOnlineStatus(){
                 break;
               case 'flip':
                 iNum = parseInt(response.value)
-                if(R[iNum].readSync()==0){
-                  R[iNum].writeSync(1);
-                }else{
-                  R[iNum].writeSync(0);
+                if(iNum>=0 && iNum<R.length){
+                  if(R[iNum].readSync()==0){
+                    R[iNum].writeSync(1);
+                  }else{
+                    R[iNum].writeSync(0);
+                  }  
                 }
                 break;
             }
