@@ -29,25 +29,36 @@ var switches = R.length; //Number of relays.
 var isActive = false; //Status of relays
 var myId = uuidv4().toString(); //generate a UUID at startup. If an existing UUID is present, we will use that otherwise we will use this and write it back to the ID file
 console.log("My new Id is : "+myId)
-fs.exists(__dirname+'/'+IDFILE,()=>{
-  console.log("ID File exists!")
-  fs.readFile(__dirname + '/'+IDFILE, (err,data)=>{
-      if(err){
-        console.log("Error reading ID");
-        http.close();
-      }else{
-        console.log("ID File exists!")
-        myId = data.toString();
-      }
-  });
-});
-console.log("My final Id is : "+myId)
-
-fs.writeFile(__dirname+'/'+IDFILE,myId,(err)=>{
+fs.stat(__dirname+'/'+IDFILE,(err,stats)=>{
   if(err){
-      console.log("Unable to set the UUID\n"+err.message);
+    fs.writeFile(__dirname+'/'+IDFILE,myId,(err)=>{
+      if(err){
+          console.log("Unable to set the UUID\n"+err.message);
+      }else{
+        console.log("ID saved to file")
+      }
+    });
+  }else{
+    console.log("ID File exists!")
+    fs.readFile(__dirname + '/'+IDFILE, (err,data)=>{
+        if(err){
+          console.log("Error reading ID");
+          http.close();
+        }else{
+          console.log("ID read from file!")
+          myId = data.toString();
+          fs.writeFile(__dirname+'/'+IDFILE,myId,(err)=>{
+            if(err){
+                console.log("Unable to set the UUID\n"+err.message);
+            }else{
+              console.log("ID saved to file")
+            }
+          });
+        }
+    });
   }
 });
+console.log("My final Id is : "+myId)
 const APPURL = MYDOMAIN+'/api.php'; //URL of the application on the internet
 
 http.listen(PORT); //listen to port (either the system or local 5000)
