@@ -10,9 +10,10 @@ R[5] = new Gpio(23, 'out');  //use GPIO pin 23 for Relay 6, and specify that it 
 R[6] = new Gpio(24, 'out');  //use GPIO pin 24 for Relay 7, and specify that it is output
 R[7] = new Gpio(25, 'out');  //use GPIO pin 25 for Relay 8, and specify that it is output
 const MYNAME = 'Eight-Port-Relay';
+const PORTS = 8;
 
 const PORT = process.env.PORT || 5000;
-const IDFILE = '.myid.dat'; //name of the file containing the UUID for instance
+const IDFILE = __dirname+'/.myid.dat'; //name of the file containing the UUID for instance
 const http = require('http').createServer(handler); //require http server, and create server with function handler()
 const https = require('https'); // required to send post requests to API Server
 const fs = require('fs'); //require filesystem module
@@ -31,21 +32,19 @@ var direction = 1; //addition direction (+1 to move forward, -1 to move backward
 var switches = R.length; //Number of relays.
 var isActive = false; //Status of relays
 var myId = uuidv4().toString(); //generate a UUID at startup. If an existing UUID is present, we will use that otherwise we will use this and write it back to the ID file
-fs.exists(__dirname+'/'+IDFILE,()=>{
-  fs.readFile(__dirname + '/'+IDFILE, (err,data)=>{
-      if(err){
-          console.log("Error reading ID");
-          http.close();
-      }else{
-          myId = data.toString();
-      }
-  });
-});
-fs.writeFile(__dirname+'/'+IDFILE,myId,(err)=>{
-  if(err){
-      console.log("Unable to set the UUID\n"+err.message);
+
+try{
+  var idContents = fs.readFileSync(IDFILE);
+  myId = idContents.toString();
+}catch(err){
+  if(err.code == 'ENOENT'){
+    try{
+      fs.writeFileSync(IDFILE,myId);
+    }catch(err){
+      console.log("Unable to update myId in file");
+    }
   }
-});
+}
 const APPURL = MYDOMAIN+'/api.php'; //URL of the application on the internet
 
 http.listen(PORT); //listen to port (either the system or local 5000)
@@ -123,10 +122,16 @@ function blink(){
   }
 }
 
+function checkVal(val,idx){
+  //console.log('Checking for '+val+' and '+idx+' this is: '+parseInt(this));
+  return (parseInt(this)==val);
+}
+
 function getOnlineStatus(){
   const data = JSON.stringify({
     name: MYNAME,
-    uuid: myId
+    uuid: myId,
+    ports: PORTS
   });
   
   const options = {
@@ -160,13 +165,16 @@ function getOnlineStatus(){
                 speed=parseInt(response.value);
                 break;
               case 'flip':
-                iNum = parseInt(response.value)
-                if(iNum>=0 && iNum<R.length){
-                  if(R[iNum].readSync()==0){
-                    R[iNum].writeSync(1);
+                //console.log('Flipping switches');
+                //console.log(response.value);
+                aNums = response.value.split(',');
+                for(i=0;i<R.length;i++){
+                  //console.log(aNums.find(checkVal,i));
+                  if(aNums.find(checkVal,i)){
+                    R[i].writeSync(1);
                   }else{
-                    R[iNum].writeSync(0);
-                  }  
+                    R[i].writeSync(0);
+                  }
                 }
                 break;
             }
@@ -179,6 +187,8 @@ function getOnlineStatus(){
     setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
   });
   
+
+
   req.on('error', (error) => {
     console.error(error);
   });

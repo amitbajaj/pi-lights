@@ -118,6 +118,11 @@ function blink(){
   }
 }
 
+function checkVal(val,idx){
+  //console.log('Checking for '+val+' and '+idx+' this is: '+parseInt(this));
+  return (parseInt(this)==val);
+}
+
 function getOnlineStatus(){
   const data = JSON.stringify({
     name: MYNAME,
@@ -156,13 +161,16 @@ function getOnlineStatus(){
                 speed=parseInt(response.value);
                 break;
               case 'flip':
-                iNum = parseInt(response.value)
-                if(iNum>=0 && iNum<R.length){
-                  if(R[iNum].readSync()==0){
-                    R[iNum].writeSync(1);
+                //console.log('Flipping switches');
+                //console.log(response.value);
+                aNums = response.value.split(',');
+                for(i=0;i<R.length;i++){
+                  //console.log(aNums.find(checkVal,i));
+                  if(aNums.find(checkVal,i)){
+                    R[i].writeSync(1);
                   }else{
-                    R[iNum].writeSync(0);
-                  }  
+                    R[i].writeSync(0);
+                  }
                 }
                 break;
             }
@@ -175,6 +183,8 @@ function getOnlineStatus(){
     setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);  
   });
   
+
+
   req.on('error', (error) => {
     console.error(error);
   });
