@@ -28,16 +28,21 @@ var direction = 1; //addition direction (+1 to move forward, -1 to move backward
 var switches = R.length; //Number of relays.
 var isActive = false; //Status of relays
 var myId = uuidv4().toString(); //generate a UUID at startup. If an existing UUID is present, we will use that otherwise we will use this and write it back to the ID file
+console.log("My new Id is : "+myId)
 fs.exists(__dirname+'/'+IDFILE,()=>{
+  console.log("ID File exists!")
   fs.readFile(__dirname + '/'+IDFILE, (err,data)=>{
       if(err){
-          console.log("Error reading ID");
-          http.close();
+        console.log("Error reading ID");
+        http.close();
       }else{
-          myId = data.toString();
+        console.log("ID File exists!")
+        myId = data.toString();
       }
   });
 });
+console.log("My final Id is : "+myId)
+
 fs.writeFile(__dirname+'/'+IDFILE,myId,(err)=>{
   if(err){
       console.log("Unable to set the UUID\n"+err.message);
