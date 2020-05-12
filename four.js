@@ -9,7 +9,7 @@ const MYNAME = 'Four-Port-Relay';
 const PORTS = 4;
 
 const PORT = process.env.PORT || 5000;
-const IDFILE = '.myid.dat'; //name of the file containing the UUID for instance
+const IDFILE = __dirname+'/.myid.dat'; //name of the file containing the UUID for instance
 const http = require('http').createServer(handler); //require http server, and create server with function handler()
 const https = require('https'); // required to send post requests to API Server
 const fs = require('fs'); //require filesystem module
@@ -28,37 +28,19 @@ var direction = 1; //addition direction (+1 to move forward, -1 to move backward
 var switches = R.length; //Number of relays.
 var isActive = false; //Status of relays
 var myId = uuidv4().toString(); //generate a UUID at startup. If an existing UUID is present, we will use that otherwise we will use this and write it back to the ID file
-console.log("My new Id is : "+myId)
-fs.stat(__dirname+'/'+IDFILE,(err,stats)=>{
-  if(err){
-    fs.writeFile(__dirname+'/'+IDFILE,myId,(err)=>{
-      if(err){
-          console.log("Unable to set the UUID\n"+err.message);
-      }else{
-        console.log("ID saved to file")
-      }
-    });
-  }else{
-    console.log("ID File exists!")
-    fs.readFile(__dirname + '/'+IDFILE, (err,data)=>{
-        if(err){
-          console.log("Error reading ID");
-          http.close();
-        }else{
-          console.log("ID read from file!")
-          myId = data.toString();
-          fs.writeFile(__dirname+'/'+IDFILE,myId,(err)=>{
-            if(err){
-                console.log("Unable to set the UUID\n"+err.message);
-            }else{
-              console.log("ID saved to file")
-            }
-          });
-        }
-    });
+
+try{
+  var idContents = fs.readFileSync(IDFILE);
+  myId = idContents.toString();
+}catch(err){
+  if(err.code == 'ENOENT'){
+    try{
+      fs.writeFileSync(IDFILE,myId);
+    }catch(err){
+      console.log("Unable to update myId in file");
+    }
   }
-});
-console.log("My final Id is : "+myId)
+}
 const APPURL = MYDOMAIN+'/api.php'; //URL of the application on the internet
 
 http.listen(PORT); //listen to port (either the system or local 5000)
