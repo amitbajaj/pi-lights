@@ -11,6 +11,9 @@ R[6] = new Gpio(24, 'out');  //use GPIO pin 24 for Relay 7, and specify that it 
 R[7] = new Gpio(25, 'out');  //use GPIO pin 25 for Relay 8, and specify that it is output
 const MYNAME = 'Eight-Port-Relay';
 const PORTS = 8;
+//const STATE_PATTERN = [[200,"0000"], [200,"1000"], [200,"1100"], [200,"1110"], [200,"1111"], [200,"0111"], [200,"0011"], [200,"0001"]]
+const STATE_PATTERN = ["0000","1000","1100","1110","1111","0111","0011","0001", "0000", "1100", "0110", "0011", "0110", "1100", "0110", "0011", "0110", "1100"];
+
 
 const PORT = process.env.PORT || 5000;
 const IDFILE = __dirname+'/.myid.dat'; //name of the file containing the UUID for instance
@@ -23,8 +26,9 @@ const static = require('node-static'); //require the node-static module to serve
 const file = new static.Server('./static'); //serve static content from a specific folder only
 const got = require('got'); //got library for calling API calls
 const FormData = require('form-data'); //form-data library for sending formdata in got API calls
+const { setPriority } = require('os');
 const ONLINE_CHECK_INTERVAL = 1000; //millisecond after which to check the status from online URL
-const MYDOMAIN = "https://bajajtech.in/lights"; // namespace for UUID and APPURL
+const MYDOMAIN = "https://bajajtech.in/"; // namespace for UUID and APPURL
 var speed = 500; //Current interval between on and off sequences
 var t; //the Interval Timer handle
 var counter = 1; //Addition factor
@@ -45,7 +49,7 @@ try{
     }
   }
 }
-const APPURL = MYDOMAIN+'/api.php'; //URL of the application on the internet
+const APPURL = MYDOMAIN+'/lights/code/api.php'; //URL of the application on the internet
 
 http.listen(PORT); //listen to port (either the system or local 5000)
 
@@ -108,6 +112,7 @@ function switchoff(){
     R[i].writeSync(0);
   }
 }
+
 function blink(){
   for(i=0;i<switches;i++){
     R[i].writeSync(counter-i-1==0?0:1);
@@ -119,6 +124,25 @@ function blink(){
     setTimeout(blink,speed);
   }else{
     switchoff();
+  }
+}
+
+var iPatternId = 0;
+function runPattern(){
+  setState(STATE_PATTERN[iPatternId]);
+  iPatternId++;
+  if (iPatternId >= STATE_PATTERN.length) iPatternId = 0;
+  if(isActive){
+    setTimeout(runPattern, speed);
+  }else{
+    switchoff();
+  }
+    
+}
+
+function setState(currentState){
+  for(i=0;i<currentState.length;i++){
+    R[i].writeSync(parseInt(currentState[i]));
   }
 }
 
@@ -175,6 +199,12 @@ function getOnlineStatus(){
                   }else{
                     R[i].writeSync(0);
                   }
+                }
+                break;
+              case 'pattern':
+                if(!isActive){
+                  isActive=true;
+                  runPattern();
                 }
                 break;
             }
