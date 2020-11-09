@@ -25,6 +25,7 @@ const FormData = require('form-data'); //form-data library for sending formdata 
 const { setPriority } = require('os');
 const ONLINE_CHECK_INTERVAL = 1000; //millisecond after which to check the status from online URL
 const MYDOMAIN = "https://bajajtech.in/"; // namespace for UUID and APPURL
+const { num2bin } = require("./common");
 var speed = 500; //Current interval between on and off sequences
 var t; //the Interval Timer handle
 var counter = 1; //Addition factor
@@ -224,3 +225,4 @@ function getOnlineStatus(){
 }
 
 setTimeout(getOnlineStatus,ONLINE_CHECK_INTERVAL);
+console.log(num2bin(2,4));
